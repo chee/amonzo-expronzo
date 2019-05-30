@@ -1,5 +1,5 @@
 {
-  "name": "monzo-expronzo",
+  "name": "amonzo-expronzo",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "keywords": [],
   "author": "chee <chee@snoot.club>",
-  "license": "ISC",
+  "license": "GPL-3.0+",
   "dependencies": {
     "amex": "0.0.1",
     "puppeteer": "^1.17.0"
