@@ -1,6 +1,23 @@
 #!/bin/bash
+source .env
 dedupe_id=$RANDOM-amonzo-expronzo
-current_pot_value=$(http "https://api.monzo.com/pots" "Authorization: Bearer $access_token" | jq ".pots[] | select(.id==\"$pot_id\") | .balance")
+pots=$(http "https://api.monzo.com/pots" "Authorization: Bearer $access_token" )
+current_pot_value=$(echo -n $pots | jq ".pots[] | select(.id==\"$pot_id\") | .balance")
+if [ $? != 0 ]; then
+	if [ -z "$refresh_token" ]; then
+		echo 'BAD POPO: $access_token expired and no $refresh_token, gotta get gint'
+		exit 1
+	fi
+	response=$(http --form POST "https://api.monzo.com/oauth2/token" \
+		"grant_type=refresh_token" \
+		"client_id=$client_id" \
+		"client_secret=$client_secret" \
+		"refresh_token=$refresh_token")
+	activity_token=$(echo $response | jq .access_token)
+	refresh_token=$(echo $response | jq .refresh_token)
+	echo "activity_token=\"$activity_token\"" >> .env
+	echo "refresh_token=\"$refresh_token\"" >> .env
+fi
 echo "there's currently $current_pot_value pennies in the amex pot"
 current_balance=$(($(node get-balance.js) * 100))
 echo "the amex balance is $current_balance pennies"
@@ -20,7 +37,7 @@ http --form PUT "https://api.monzo.com/pots/$pot_id/deposit" \
 	"Authorization: Bearer $access_token" \
 	"source_account_id=$account_id" \
 	"amount=$increase" \
-	"dedupe_id=$dedupe_id"
+	"dedupe_id=$dedupe_id" > /dev/null
 
 echo "transaction complete!!"
 current_pot_value=$(http "https://api.monzo.com/pots" "Authorization: Bearer $access_token" | jq ".pots[] | select(.id==\"$pot_id\") | .balance")
@@ -35,4 +52,4 @@ http --form POST "https://api.monzo.com/feed" \
 	"params[background_color]=#fefefe" \
 	"params[body_color]=#333" \
 	"params[title_color]=#333" \
-	"params[body]=$increase pennies moved to amex pot 💅"
+	"params[body]=$increase pennies moved to amex pot 💅" > /dev/null
