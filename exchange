@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# get these by creating an app, setting any redirect uri, and following
+# the steps here: https://docs.monzo.com/#acquire-an-access-token
+# you don't actually need to have an app, the information is all in the
+# url in the email
+code=
+client_id=
+client_secret=
+redirect_uri=
+
+http --form POST "https://api.monzo.com/oauth2/token" \
+    "grant_type=authorization_code" \
+    "client_id=$client_id" \
+    "client_secret=$client_secret" \
+    "redirect_uri=$redirect_uri" \
+    "code=$code"
