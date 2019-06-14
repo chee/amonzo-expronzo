@@ -2,8 +2,8 @@
 source .env
 dedupe_id=$RANDOM-amonzo-expronzo
 pots=$(http "https://api.monzo.com/pots" "Authorization: Bearer $access_token" )
-current_pot_value=$(echo -n $pots | jq ".pots[] | select(.id==\"$pot_id\") | .balance")
-if [ $? != 0 ]; then
+code=$(echo -n $pots | jq -r .code)
+if [ "$code" == "unauthorized.auth_required" ]; then
 	if [ -z "$refresh_token" ]; then
 		echo 'BAD POPO: $access_token expired and no $refresh_token, gotta get gint'
 		exit 1
@@ -13,11 +13,13 @@ if [ $? != 0 ]; then
 		"client_id=$client_id" \
 		"client_secret=$client_secret" \
 		"refresh_token=$refresh_token")
-	activity_token=$(echo $response | jq .access_token)
-	refresh_token=$(echo $response | jq .refresh_token)
+	echo $response
+	activity_token=$(echo $response | jq -r .access_token)
+	refresh_token=$(echo $response | jq -r .refresh_token)
 	echo "activity_token=\"$activity_token\"" >> .env
 	echo "refresh_token=\"$refresh_token\"" >> .env
 fi
+current_pot_value=$(echo -n $pots | jq ".pots[] | select(.id==\"$pot_id\") | .balance")
 echo "there's currently $current_pot_value pennies in the amex pot"
 current_balance=$(($(node get-balance.js) * 100))
 echo "the amex balance is $current_balance pennies"
