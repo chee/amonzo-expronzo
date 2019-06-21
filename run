@@ -3,7 +3,7 @@ source .env
 dedupe_id=$RANDOM-amonzo-expronzo
 pots=$(http "https://api.monzo.com/pots" "Authorization: Bearer $access_token" )
 code=$(echo -n $pots | jq -r .code)
-if [ "$code" == "unauthorized.auth_required" ]; then
+if [ "$code" == "unauthorized.bad_access_token.expired" ]; then
 	if [ -z "$refresh_token" ]; then
 		echo 'BAD POPO: $access_token expired and no $refresh_token, gotta get gint'
 		exit 1
