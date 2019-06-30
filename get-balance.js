@@ -1,3 +1,4 @@
+require("dotenv").config()
 let pup = require("puppeteer")
 
 ;(async function() {

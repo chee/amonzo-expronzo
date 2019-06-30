@@ -12,6 +12,7 @@
   "license": "GPL-3.0+",
   "dependencies": {
     "amex": "0.0.1",
+    "dotenv": "^8.0.0",
     "puppeteer": "^1.17.0"
   }
 }
