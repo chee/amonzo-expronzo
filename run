@@ -16,10 +16,19 @@ if [ "$code" == "unauthorized.bad_access_token.expired" ]; then
 	echo $response
 	access_token=$(echo $response | jq -r .access_token)
 	refresh_token=$(echo $response | jq -r .refresh_token)
-	echo "access_token=\"$access_token\"" >> .env
-	echo "refresh_token=\"$refresh_token\"" >> .env
+        if [ -z "$access_token" ] || [ -z "$refresh_token" ]; then
+		exit 2
+        else
+		echo "access_token=\"$access_token\"" >> .env
+		echo "refresh_token=\"$refresh_token\"" >> .env
+		exit 3
+	fi
 fi
 current_pot_value=$(echo -n $pots | jq ".pots[] | select(.id==\"$pot_id\") | .balance")
+if [ -z "$current_pot_value" ]; then
+	echo "DIDNT GET A CURRENT POT VALUE"
+	exit 2
+fi
 echo "there's currently $current_pot_value pennies in the amex pot"
 current_balance=$(($(node get-balance.js) * 100))
 echo "the amex balance is $current_balance pennies"
