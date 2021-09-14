@@ -41,3 +41,7 @@ available_credit | the total available credit in your amex account
 * don't @ me
 * pull requests welcome
 * actually you can @ me sorry for being defensive
+
+## credits
+
+simon legg thought of this
